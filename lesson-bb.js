@@ -8,11 +8,20 @@ var AppData = Backbone.Model.extend({
 
 var appData = new AppData();
 
+// Collection
+var AppDataCollection = Backbone.Collection.extend({
+  url: 'https://api.github.com/repos/jashkenas/backbone/commits'
+});
+
+var appDataCollection = new AppDataCollection();
+
 // Views
 var MainPage = Backbone.View.extend({
   el: $("#pages-output"),
   model: appData,
+  collection: appDataCollection,
   template: _.template($('#main-page').html()),
+  templateList: _.template($('#list-element').html()),
   events: {
     'click .close': 'close'
   },
@@ -20,6 +29,15 @@ var MainPage = Backbone.View.extend({
     this.model.fetch({
       success: () => {
         $(this.el).html(this.template(this.model.toJSON()));
+      }
+    });
+  },
+  renderList: function() {
+    this.collection.fetch({
+      success: () => {
+        $(this.el).html(this.templateList({
+          items: this.collection.toJSON()
+        }));
       }
     });
   },
